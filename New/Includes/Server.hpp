@@ -67,6 +67,11 @@ class Server
         // Utils
         bool sendMessage(std::string code, std::string message, User *user);
         std::string formatSendMessage(std::string code, std::string message, User *user);
+        
+        bool sendChannelMessage(std::string code, std::string message, Channel *channel, User *user);
+        std::string formatSendChannelMessage(std::string code, std::string message, Channel *channel, User *user);
+
+        
         std::pair<std::string, int> readFromClientSocket(int socket);
 
         // User managements
@@ -103,10 +108,10 @@ class Server
         void setClients(std::vector<int>* clients);
 
         // void createChannel(const std::string& channelName);
-        Channel *createChannel(const std::string& channelName);
+        Channel *createChannel(const std::string& channelName, User* operatorUser);
         void joinChannel(User* user, const std::string& channelName);
         void leaveChannel(User* user, const std::string& channelName);
-        void sendMessageToChannel(User* sender, const std::string& channelName, const std::string& message);
+        void sendPrivateMessage(User* sender, const std::string& channelName, const std::string& message);
         Channel* getChannelByName(const std::string& channelName);
 };
 

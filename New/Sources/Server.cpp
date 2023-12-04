@@ -253,31 +253,27 @@ void Server::handleClientData(User *user) {
         handleClientDisconnection(user);
         return;
     }
-    std::cout << "Buffer before trim: |" << read.first << "|" << std::endl;
     std::string buffer = trimString(read.first);
-    // buffer.erase(buffer.size() - 2);
-    std::cout << "Buffer after trim: |" << buffer << "|" << std::endl;
     std::vector<std::string> commandArgs = splitString(buffer, ' ');
-    for (std::vector<std::string>::iterator it = commandArgs.begin(); it != commandArgs.end(); ++it) {
-        std::cout << "Command arg: |" << *it << "|" << std::endl;
-    }
-    // if (buffer == "") {
-    //     handleClientDisconnection(user);
-    //     return;
-    // }
 
     // if command args first == "NICK"
     if (commandArgs[0] == "JOIN") {
         if (commandJoin(this, user, commandArgs) == false)
             return;
     }
+    else if (commandArgs[0] == "KICK") {
+        if (commandKick(this, user, commandArgs) == false)
+            return;
+    }
     // if (buffer.substr(0, 4) == "JOIN") {
     //     std::string channelName = buffer.substr(6);
     //     joinChannel(user, channelName);
+    // } else if (buffer.substr(0, 4) == "KICK") {
+    //        commandKick(this, user, splitCommandUser(buffer));
     // } else if (buffer.substr(0, 7) == "PRIVMSG") {
     //     std::string channelName = buffer.substr(9, buffer.find(' ', 9) - 9);
     //     std::string message = buffer.substr(buffer.find(' ', 9) + 1);
-    //     sendMessageToChannel(user, channelName, message);
+    //     sendPrivateMessage(user, channelName, message);
     // }
 }
 
@@ -301,6 +297,21 @@ std::pair<std::string, int> Server::readFromClientSocket(int socket) {
         }
     }
     return std::make_pair("", -1);
+}
+
+
+bool    Server::sendChannelMessage(std::string code, std::string message, Channel *channel, User *user) {
+    std::string formattedMessage = formatSendChannelMessage(code, message, channel, user);
+    std::cout << "Sending message: |" << formattedMessage << "|" << std::endl;
+    send(user->getSocket(), formattedMessage.c_str(), formattedMessage.size(), 0);
+    return true;
+}
+
+std::string Server::formatSendChannelMessage(std::string code, std::string message, Channel *channel, User *user)
+{
+    std::string send;
+    send = ":ft_irc " + code + " " + user->getNickname() + " #" + channel->getName() + " :" + message + "\r\n";
+    return send;
 }
 
 bool    Server::sendMessage(std::string code, std::string message, User *user) {
@@ -424,9 +435,10 @@ User *Server::getUserByCompleteName(const std::string& completeName) {
 //     getChannels().push_back(new Channel(channelName));
 // }
 
-Channel *Server::createChannel(const std::string& channelName) {
-    Channel *channel = new Channel(channelName);
-    getChannels().push_back(channel);
+Channel *Server::createChannel(const std::string& channelName, User* user) {
+    Channel *channel = new Channel(channelName, user);
+    std::cout << "Channel name create: " << channel->getName() << std::endl;
+    _channels.push_back(channel);
     return channel;
 }
 
@@ -461,7 +473,7 @@ void Server::leaveChannel(User* user, const std::string& channelName) {
     }
 }
 
-void Server::sendMessageToChannel(User* sender, const std::string& channelName, const std::string& message) {
+void Server::sendPrivateMessage(User* sender, const std::string& channelName, const std::string& message) {
     Channel* channel = getChannelByName(channelName);
     if (channel) {
         for (int i = 0; i < (int)channel->getUsers().size(); i++) {
@@ -485,7 +497,7 @@ Channel* Server::getChannelByName(const std::string& channelName) {
             return _channels[i];
         }
     }
-    return nullptr; 
+    return NULL; 
 }
 
 // Getters
