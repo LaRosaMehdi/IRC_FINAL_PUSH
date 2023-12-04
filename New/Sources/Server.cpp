@@ -98,7 +98,7 @@ void Server::run() {
                 if (i == _socket)
                     handleClientConnection();
                 else
-                    handleClientData(i);
+                    handleClientData(getUserBySocket(i));
             }
         }
     }
@@ -123,7 +123,7 @@ void Server::handleClientConnection() {
     
     std::pair<std::string, int> read = readFromClientSocket(user->getSocket());
     if (read.first == "" && read.second == -1) {
-        delete user;
+        handleClientDisconnection(user);
         return;
     }
     std::string buffer = read.first;
@@ -214,7 +214,14 @@ bool Server::handleClientConnectionNc(User *user) {
 }
 
 bool Server::connectClient(User *user) {
-    if (user->isConnected() == true || user->isAccepted() == false || user->getUsername() == "default" || user->getNickname() == "default") {
+    if (user->isConnected() == true) {
+        sendMessage("462", "Unauthorized command (already registered)", user);
+        logs("ERROR", "User :" + user->getCompleteName() + " already connected or not accepted");
+        return false;
+    }
+    else if (user->isAccepted() == false) {
+        sendMessage("462", "Unauthorized command (not accepted)", user);
+        logs("ERROR", "User :" + user->getCompleteName() + " not accepted");
         return false;
     }
     User *tmp = getUserByCompleteName(user->getCompleteName());
@@ -240,25 +247,38 @@ void Server::handleClientDisconnection(User *user) {
 
 // Read data handling
 
-void Server::handleClientData(int socket) {
-    std::pair<std::string, int> read = readFromClientSocket(socket);
-    std::string buffer = read.first;
-    buffer.erase(buffer.size() - 2);
-    User* user = getUserBySocket(socket);
-
-    if (buffer == "") {
+void Server::handleClientData(User *user) {
+    std::pair<std::string, int> read = readFromClientSocket(user->getSocket());
+    if (read.first == "" && read.second == -1) {
         handleClientDisconnection(user);
         return;
     }
-
-    if (buffer.substr(0, 4) == "JOIN") {
-        std::string channelName = buffer.substr(6);
-        joinChannel(user, channelName);
-    } else if (buffer.substr(0, 7) == "PRIVMSG") {
-        std::string channelName = buffer.substr(9, buffer.find(' ', 9) - 9);
-        std::string message = buffer.substr(buffer.find(' ', 9) + 1);
-        sendMessageToChannel(user, channelName, message);
+    std::cout << "Buffer before trim: |" << read.first << "|" << std::endl;
+    std::string buffer = trimString(read.first);
+    // buffer.erase(buffer.size() - 2);
+    std::cout << "Buffer after trim: |" << buffer << "|" << std::endl;
+    std::vector<std::string> commandArgs = splitString(buffer, ' ');
+    for (std::vector<std::string>::iterator it = commandArgs.begin(); it != commandArgs.end(); ++it) {
+        std::cout << "Command arg: |" << *it << "|" << std::endl;
     }
+    // if (buffer == "") {
+    //     handleClientDisconnection(user);
+    //     return;
+    // }
+
+    // if command args first == "NICK"
+    if (commandArgs[0] == "JOIN") {
+        if (commandJoin(this, user, commandArgs) == false)
+            return;
+    }
+    // if (buffer.substr(0, 4) == "JOIN") {
+    //     std::string channelName = buffer.substr(6);
+    //     joinChannel(user, channelName);
+    // } else if (buffer.substr(0, 7) == "PRIVMSG") {
+    //     std::string channelName = buffer.substr(9, buffer.find(' ', 9) - 9);
+    //     std::string message = buffer.substr(buffer.find(' ', 9) + 1);
+    //     sendMessageToChannel(user, channelName, message);
+    // }
 }
 
 // Tools
@@ -285,6 +305,7 @@ std::pair<std::string, int> Server::readFromClientSocket(int socket) {
 
 bool    Server::sendMessage(std::string code, std::string message, User *user) {
     std::string formattedMessage = formatSendMessage(code, message, user);
+    std::cout << "Sending message: |" << formattedMessage << "|" << std::endl;
     if (send(user->getSocket(), formattedMessage.c_str(), formattedMessage.size(), 0) == -1) {
         logs("ERROR", "Error sending message");
         return false;
@@ -399,30 +420,36 @@ User *Server::getUserByCompleteName(const std::string& completeName) {
 
 // Channel management
 
-void Server::createChannel(const std::string& channelName) {
-    _channels.push_back(new Channel(channelName));
+// void Server::createChannel(const std::string& channelName) {
+//     getChannels().push_back(new Channel(channelName));
+// }
+
+Channel *Server::createChannel(const std::string& channelName) {
+    Channel *channel = new Channel(channelName);
+    getChannels().push_back(channel);
+    return channel;
 }
 
-void Server::joinChannel(User* user, const std::string& channelName) {
-    Channel* channel = getChannelByName(channelName);
+// void Server::joinChannel(User* user, const std::string& channelName) {
+//     Channel* channel = getChannelByName(channelName);
    
-    if (channel != nullptr) {
-        std::cout << "DANS" << std::endl;
-        channel->addUser(user);
-        logs("LOG", user->getNickname() + " joined channel " + channel->getName());
-        sendMessage("JOINCHANNEL", "Joined channel " + channel->getName(), user);
-    } else {
-        createChannel(channelName);
-        channel = getChannelByName(channelName);
-        if (channel != nullptr) {
-            channel->addUser(user);
-            logs("LOG", user->getNickname() + " joined channel the" + channel->getName());
-            sendMessage("JOINCHANNEL", "Joined channel " + channel->getName(), user);
-        } else {
-            std::cerr << "Failed to create or join channel: " << channelName << std::endl;
-        }
-    }
-}
+//     if (channel != nullptr) {
+//         std::cout << "DANS" << std::endl;
+//         channel->addUser(user);
+//         logs("LOG", user->getNickname() + " joined channel " + channel->getName());
+//         sendMessage("JOINCHANNEL", "Joined channel " + channel->getName(), user);
+//     } else {
+//         createChannel(channelName);
+//         channel = getChannelByName(channelName);
+//         if (channel != nullptr) {
+//             channel->addUser(user);
+//             logs("LOG", user->getNickname() + " joined channel the" + channel->getName());
+//             sendMessage("JOINCHANNEL", "Joined channel " + channel->getName(), user);
+//         } else {
+//             std::cerr << "Failed to create or join channel: " << channelName << std::endl;
+//         }
+//     }
+// }
 
 
 void Server::leaveChannel(User* user, const std::string& channelName) {
@@ -474,6 +501,8 @@ struct sockaddr_in Server::getAddress() const { return _address; }
 std::vector<int>* Server::getClients() const { return _clients; }
 
 std::vector<User *> Server::getUsers() const { return _users; }
+
+std::vector<Channel*> Server::getChannels() const { return _channels; }
 
 // Setters
 

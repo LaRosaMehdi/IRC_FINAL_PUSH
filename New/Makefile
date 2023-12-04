@@ -10,7 +10,8 @@ SRCS = \
     $(SRC_DIR)/User.cpp \
     $(SRC_DIR)/Commands/pass.cpp \
     $(SRC_DIR)/Commands/nick.cpp \
-    $(SRC_DIR)/Commands/user.cpp
+    $(SRC_DIR)/Commands/user.cpp \
+    $(SRC_DIR)/Commands/join.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 

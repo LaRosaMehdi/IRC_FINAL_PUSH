@@ -61,7 +61,7 @@ class Server
         bool handleClientConnectionNc(User *user);
         bool handleClientConnectionIrssi(User *user, std::string buffer);
         void handleClientDisconnection(User *user);
-        void handleClientData(int socket);
+        void handleClientData(User *user);
         bool connectClient(User *user);
 
         // Utils
@@ -95,13 +95,15 @@ class Server
         struct sockaddr_in getAddress() const;
         std::vector<int>* getClients() const;
         std::vector<User *> getUsers() const;
+        std::vector<Channel*> getChannels() const;
 
         // Setters
         void setPort(int port);
         void setPassword(const std::string& password);
         void setClients(std::vector<int>* clients);
 
-        void createChannel(const std::string& channelName);
+        // void createChannel(const std::string& channelName);
+        Channel *createChannel(const std::string& channelName);
         void joinChannel(User* user, const std::string& channelName);
         void leaveChannel(User* user, const std::string& channelName);
         void sendMessageToChannel(User* sender, const std::string& channelName, const std::string& message);

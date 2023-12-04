@@ -23,4 +23,6 @@ class Server;
 bool    commandPass(Server *server, User *user, std::vector<std::string> args);
 bool    commandNick(Server *server, User *user, std::vector<std::string> args);
 bool    commandUser(Server *server, User *user, std::vector<std::string> args);
+bool    commandJoin(Server *server, User *user, std::vector<std::string> args);
+
 #endif

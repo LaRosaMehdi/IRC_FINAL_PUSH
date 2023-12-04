@@ -22,7 +22,9 @@
 
 class Channel {
     public:
-        Channel(const std::string& name) : _name(name) {}
+        Channel(const std::string& name) : _name(name) {
+            setTopic("");
+        }
         ~Channel() {}
         std::string getName() const {
         return _name;
@@ -50,9 +52,33 @@ class Channel {
         std::vector<User *> getUsers() const {
             return _users;
         }
+
+        std::string getTopic() const {
+            return _topic;
+        }
+
+        void setTopic(const std::string& topic) {
+            _topic = topic;
+        }
+
+        std::string	getUsersList(void)
+        {
+            std::stringstream ss;
+            std::vector<User*>::iterator begin = _users.begin();
+            std::vector<User*>::iterator end = _users.end();
+            for (; begin != end; begin++)
+            {
+                User* user = (*begin);
+                if (user == NULL) continue;
+                // if (isOperator(user)) ss << "@";
+                ss << user->getNickname() << " ";
+            }
+            return ss.str();
+        }
         
     private:
         std::string _name;
+        std::string _topic;
         std::vector<User*> _users;
         std::vector<std::string> _messages;
 };
