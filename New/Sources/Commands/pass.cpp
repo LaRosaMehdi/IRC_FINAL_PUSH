@@ -37,17 +37,17 @@
 
 bool    commandPass(Server *server, User *user, std::vector<std::string> args) {
 	if (user != NULL && user->isConnected() == true) {
-		server->sendMessage("462", "Unauthorized command (already registered)", user);
+		user->sendMessage("462", "Unauthorized command (already registered)");
 		logs("LOG", "PASS :" + user->getCompleteName() + " (already registered)");
 		return false;
 	}
 	else if (args.size() != 2) {
-		server->sendMessage("461", "Not enough parameters", user);
+		user->sendMessage("461", "Not enough parameters");
 		logs("LOG", "PASS :" + user->getCompleteName() + " (not enough parameters)");
 		return false;
 	}
 	else if (args[1] != server->getPassword()) {
-		server->sendMessage("464", "Password incorrect\n", user);
+		user->sendMessage("464", "Password incorrect\n");
 		logs("LOG", "PASS :" + user->getCompleteName() + " (incorrect password)");
 		return false;
 	}

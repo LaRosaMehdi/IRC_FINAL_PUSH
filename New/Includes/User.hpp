@@ -22,6 +22,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include "./utils.hpp"
 
 class User {
 
@@ -71,9 +72,9 @@ class User {
         bool isConnected() const;
 
         // Send message 
-        bool sendRawMessage(std::string message);
-        bool formatSendMessage(std::string code, std::string message);
-		
+        bool sendMessage(std::string code, std::string message);
+        std::string formatSendMessage(std::string code, std::string message);
+
         // For commands AKA Do
         bool                isCheckPwd() const;
         bool                isCheckNick() const;

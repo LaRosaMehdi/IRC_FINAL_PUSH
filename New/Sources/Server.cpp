@@ -139,7 +139,8 @@ void Server::handleClientConnection() {
                 delete user;
             }
         } else if (handleClientConnectionNc(user) == false) {
-            sendMessage("001", "Disconnecting...", user);
+            // sendMessage("001", "Disconnecting...", user);
+            user->sendMessage("001", "Disconnecting...");
             FD_CLR(clientSocket, &_readFds);
             close(clientSocket);
             delete user;
@@ -183,7 +184,8 @@ bool Server::handleClientConnectionNc(User *user) {
     std::vector<std::string> commandArgs;
     std::vector<std::string> commandUserArgs;    
    
-    sendMessage("001", "USER Please enter username:", user);
+    // sendMessage("001", "USER Please enter username:", user);
+    user->sendMessage("001", "USER Please enter username:");
     input = readFromClientSocket(user->getSocket()).first;
     commandUserArgs = splitCommandUser(trimString(input));
     commandArgs.push_back("USER");
@@ -191,7 +193,8 @@ bool Server::handleClientConnectionNc(User *user) {
     if (commandUser(this, user, commandArgs) == false)
         return false;
     
-    sendMessage("001", "NICK Please enter nickname:", user);
+    // sendMessage("001", "NICK Please enter nickname:", user);
+    user->sendMessage("001", "NICK Please enter nickname:");
     input = readFromClientSocket(user->getSocket()).first;
     commandUserArgs = splitCommandUser(trimString(input));
     commandArgs.clear();
@@ -200,7 +203,8 @@ bool Server::handleClientConnectionNc(User *user) {
     if (commandNick(this, user, commandArgs) == false) 
         return false;
 
-    sendMessage("001", "PASS Please enter password:", user);
+    // sendMessage("001", "PASS Please enter password:", user);
+    user->sendMessage("001", "PASS Please enter password:");
     input = readFromClientSocket(user->getSocket()).first;
     commandUserArgs = splitCommandUser(trimString(input));
     commandArgs.clear();
@@ -215,12 +219,14 @@ bool Server::handleClientConnectionNc(User *user) {
 
 bool Server::connectClient(User *user) {
     if (user->isConnected() == true) {
-        sendMessage("462", "Unauthorized command (already registered)", user);
+        // sendMessage("462", "Unauthorized command (already registered)", user);
+        user->sendMessage("462", "Unauthorized command (already registered)");
         logs("ERROR", "User :" + user->getCompleteName() + " already connected or not accepted");
         return false;
     }
     else if (user->isAccepted() == false) {
-        sendMessage("462", "Unauthorized command (not accepted)", user);
+        // sendMessage("462", "Unauthorized command (not accepted)", user);
+        user->sendMessage("462", "Unauthorized command (not accepted)");
         logs("ERROR", "User :" + user->getCompleteName() + " not accepted");
         return false;
     }
@@ -230,7 +236,8 @@ bool Server::connectClient(User *user) {
     logs("LOG", "New connection from " + std::string(inet_ntoa(user->getAddress().sin_addr)) + ":" + std::to_string(ntohs(user->getAddress().sin_port)));
     addUser(user);
     user->setConnected(true);
-    sendMessage("001", "Welcome to prout Internet Relay Network !", user);
+    // sendMessage("001", "Welcome to Internet Relay Network !", user);
+    user->sendMessage("001", "Welcome to Internet Relay Network !");
     return true;
 }
 
@@ -265,16 +272,12 @@ void Server::handleClientData(User *user) {
         if (commandKick(this, user, commandArgs) == false)
             return;
     }
-    // if (buffer.substr(0, 4) == "JOIN") {
-    //     std::string channelName = buffer.substr(6);
-    //     joinChannel(user, channelName);
-    // } else if (buffer.substr(0, 4) == "KICK") {
-    //        commandKick(this, user, splitCommandUser(buffer));
-    // } else if (buffer.substr(0, 7) == "PRIVMSG") {
-    //     std::string channelName = buffer.substr(9, buffer.find(' ', 9) - 9);
-    //     std::string message = buffer.substr(buffer.find(' ', 9) + 1);
-    //     sendPrivateMessage(user, channelName, message);
-    // }
+    else if (commandArgs[0] == "PRIVMSG") {
+        std::string channelName = buffer.substr(9, buffer.find(' ', 9) - 9);
+        std::string message = buffer.substr(buffer.find(' ', 9) + 1);
+        sendPrivateMessage(user, channelName, message);
+    }
+    return;
 }
 
 // Tools
@@ -297,44 +300,6 @@ std::pair<std::string, int> Server::readFromClientSocket(int socket) {
         }
     }
     return std::make_pair("", -1);
-}
-
-
-bool    Server::sendChannelMessage(std::string code, std::string message, Channel *channel, User *user) {
-    std::string formattedMessage = formatSendChannelMessage(code, message, channel, user);
-    std::cout << "Sending message: |" << formattedMessage << "|" << std::endl;
-    send(user->getSocket(), formattedMessage.c_str(), formattedMessage.size(), 0);
-    return true;
-}
-
-std::string Server::formatSendChannelMessage(std::string code, std::string message, Channel *channel, User *user)
-{
-    std::string send;
-    send = ":ft_irc " + code + " " + user->getNickname() + " #" + channel->getName() + " :" + message + "\r\n";
-    return send;
-}
-
-bool    Server::sendMessage(std::string code, std::string message, User *user) {
-    std::string formattedMessage = formatSendMessage(code, message, user);
-    std::cout << "Sending message: |" << formattedMessage << "|" << std::endl;
-    if (send(user->getSocket(), formattedMessage.c_str(), formattedMessage.size(), 0) == -1) {
-        logs("ERROR", "Error sending message");
-        return false;
-    }
-    return true;
-}
-
-std::string Server::formatSendMessage(std::string code, std::string message, User *user)
-{
-    std::string send;
-
-    send = ":ft_irc " + code + " ";
-    if (user != NULL) 
-        send += user->getNickname() + " :";
-    else
-        send += ":";
-    send += message + "\r\n";
-    return send;
 }
 
 // User management
@@ -469,7 +434,8 @@ void Server::leaveChannel(User* user, const std::string& channelName) {
     if (channel) {
         channel->removeUser(user);
         logs("LOG", user->getNickname() + " left channel " + channel->getName());
-        sendMessage("LEAVECHANNEL", "Left channel " + channel->getName(), user);
+        // sendMessage("LEAVECHANNEL", "Left channel " + channel->getName(), user);
+        user->sendMessage("LEAVECHANNEL", "Left channel " + channel->getName());
     }
 }
 

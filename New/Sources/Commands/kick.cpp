@@ -9,7 +9,7 @@ bool commandKick(Server* server, User* user, std::vector<std::string> args)
 	std::cout << "COMMAND KICK" << std::endl;
     if (args.size() < 2)
     {
-        server->sendMessage("461", "Not enough parameters", user);
+        user->sendMessage("461", "Not enough parameters");
         return false;
     }
     std::string channelName = args[1].substr(1);
@@ -22,14 +22,14 @@ bool commandKick(Server* server, User* user, std::vector<std::string> args)
 
 	if (channel == NULL)
     {
-        server->sendMessage("442", "Wrong Channel", user);
+        user->sendMessage("442", "Wrong Channel");
         return false;
 	}
     User* targetUser = channel->getUserByUsername(userName);
 	// std::cout << "targetUser"  << channel->getUserByUsername(targetUser) << std::endl;
     if (!targetUser)
     {
-        server->sendMessage("441", "They aren't on that channel", user);
+        user->sendMessage("441", "They aren't on that channel");
         return false;
     }
     if (channel->removeUser(targetUser) == false)
@@ -41,7 +41,7 @@ else
 {
     std::string Kickmessage = "KICK " + channelName + " " + userName + " :" + user->getUsername() + " " + args[3];
     logs(LOG, Kickmessage);
-    server->sendMessage("KICK", channelName + " " + userName + " :" + user->getUsername() + " " + args[3], targetUser);
+    user->sendMessage("KICK", channelName + " " + userName + " :" + user->getUsername() + " " + args[3]);
 }
 
 
@@ -52,7 +52,7 @@ for (int i = 0; i < (int)users.size(); i++)
 	std::cout << "users[" << i << "] = " << "[" << users[i]->getUsername() << "]" << std::endl;
     if (users[i] != targetUser)
     {
-        server->sendMessage("KICK", channelName + " " + userName + " :" + user->getUsername() + " " + args[3], users[i]);
+        users[i]->sendMessage("KICK", channelName + " " + userName + " :" + user->getUsername() + " " + args[3]);
     }
 }
 return true;

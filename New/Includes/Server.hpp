@@ -30,7 +30,7 @@
 
 #include "./User.hpp"
 #include "./utils.hpp"
-#include "./Channels.hpp"  // Added for Channel class
+#include "./Channel.hpp"  // Added for Channel class
 #include "./Commands.hpp"
 
 extern int defaultUserIndex;
@@ -65,12 +65,8 @@ class Server
         bool connectClient(User *user);
 
         // Utils
-        bool sendMessage(std::string code, std::string message, User *user);
-        std::string formatSendMessage(std::string code, std::string message, User *user);
-        
-        bool sendChannelMessage(std::string code, std::string message, Channel *channel, User *user);
-        std::string formatSendChannelMessage(std::string code, std::string message, Channel *channel, User *user);
-
+        // bool sendMessage(std::string code, std::string message, User *user);
+        // std::string formatSendMessage(std::string code, std::string message, User *user);
         
         std::pair<std::string, int> readFromClientSocket(int socket);
 

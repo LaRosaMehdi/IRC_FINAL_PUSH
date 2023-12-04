@@ -77,18 +77,23 @@ void User::switchPwd()  {  _checkpwd = true; }
 void User::switchUser()  {  _checkuser = true; }
 
 // Send Message 
-bool    User::sendRawMessage(std::string message) {
-    return send(this->getSocket(), message.c_str(), message.length(), 0) != -1;
+
+bool    User::sendMessage(std::string code, std::string message) {
+    std::string formattedMessage = formatSendMessage(code, message);
+    // std::cout << "Sending message: |" << formattedMessage << "|" << std::endl;
+    if (send(getSocket(), formattedMessage.c_str(), formattedMessage.size(), 0) == -1) {
+        logs("ERROR", "Error sending message");
+        return false;
+    }
+    return true;
 }
 
-bool User::formatSendMessage(std::string code, std::string message)
+std::string User::formatSendMessage(std::string code, std::string message)
 {
-    std::stringstream ss;
+    std::string send;
 
-    ss	<< ":ft_irc "
-        << code << " "
-        << this->getNickname() << " "
-        << message << "\r\n";
-
-    return this->sendRawMessage(ss.str());
+    send = ":ft_irc " + code + " ";
+    send += getNickname() + " :";
+    send += message + "\r\n";
+    return send;
 }

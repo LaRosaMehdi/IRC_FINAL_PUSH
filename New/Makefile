@@ -8,6 +8,7 @@ SRCS = \
     $(SRC_DIR)/utils.cpp \
     $(SRC_DIR)/Server.cpp \
     $(SRC_DIR)/User.cpp \
+    $(SRC_DIR)/Channel.cpp \
     $(SRC_DIR)/Commands/pass.cpp \
     $(SRC_DIR)/Commands/nick.cpp \
     $(SRC_DIR)/Commands/user.cpp \

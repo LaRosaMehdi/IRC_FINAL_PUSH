@@ -13,16 +13,14 @@
 #include "./../../Includes/Server.hpp"
 
 bool commandJoin(Server* server, User* user, std::vector<std::string> args) {
-    Channel* channel = nullptr;
+    Channel* channel = NULL;
 
     if (!user->isConnected()) {
-        server->sendMessage("451", "You have not registered", user);
+        user->sendMessage("451", "You have not registered");
         logs("LOG", "JOIN :" + user->getCompleteName() + " (not registered)");
         return false;
     } else if (args.size() != 2 || args[1] == "") {
-        std::string errorMessage = ":ft_irc 461 " + user->getNickname() + " JOIN :Not enough parameters\r\n";
-        send(user->getSocket(), errorMessage.c_str(), errorMessage.size(), 0);
-
+        user->sendMessage("461", "Not enough parameters");
         logs("LOG", "JOIN :" + user->getCompleteName() + " (not enough parameters)");
         return false;
     }
@@ -33,28 +31,22 @@ bool commandJoin(Server* server, User* user, std::vector<std::string> args) {
     } else {
         channel = server->createChannel(args[1].substr(1), user);
         if (channel == NULL) {
-            server->sendMessage("400", "Failed to create channel " + args[1].substr(1), user);
+            user->sendMessage("400", "Failed to create channel " + args[1].substr(1));
             logs("LOG", "JOIN :" + user->getCompleteName() + " (failed to create channel " + args[1].substr(1) + ")");
             return false;
         }
         channel->joinUser(user);
-        // std::string messageAddUser = ":" + user->getCompleteName() + " JOIN #" + channel->getName() + "\r\n";
-        // send(user->getSocket(), messageAddUser.c_str(), messageAddUser.size(), 0);    
     } 
     if (channel->getTopic() == "") {
-        server->sendChannelMessage("332", "No topic is set", channel, user);
+        channel->sendChannelMessage("332", "No topic is set", user);
         logs("LOG", "JOIN :" + user->getCompleteName() + " (no topic is set)");
     } else {
-        server->sendChannelMessage("332", channel->getTopic(), channel, user);
+        channel->sendChannelMessage("332", channel->getTopic(), user);
         logs("LOG", "JOIN :" + user->getCompleteName() + " (topic is set)");
     }
-
-    // user list
-    std::string messageUserList = ":ft_irc 353 " + user->getNickname() + " = #" + channel->getName() + " :" + channel->getUsersList() + "\r\n";
-    send(user->getSocket(), messageUserList.c_str(), messageUserList.size(), 0);
-
-    std::string messageEndOfNames = ":ft_irc 366 " + user->getNickname() + " #" + channel->getName() + " :End of /NAMES list\r\n";
-    send(user->getSocket(), messageEndOfNames.c_str(), messageEndOfNames.size(), 0);
+    channel->sendChannelMessage("353", channel->getUsersList(), user, true);
+    channel->sendChannelMessage("366", "End of /NAMES list", user);
+    logs("LOG", "JOIN :" + user->getCompleteName() + " (user list)");
     return true;
 }
 

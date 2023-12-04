@@ -23,14 +23,14 @@
 // }
 
 bool    commandUser(Server *server, User *user, std::vector<std::string> args) {
-	
+	(void)server;
 	if (user->isConnected() == true) {
-		server->sendMessage("462", "Unauthorized command (already registered)", user);
+		user->sendMessage("462", "Unauthorized command (already registered)");
 		logs("LOG", "USER :" + user->getCompleteName() + " (already registered)");
 		return false;
 	}
 	else if (args.size() != 5) {
-		server->sendMessage("461", "Not enough parameters", user);
+		user->sendMessage("461", "Not enough parameters");
 		logs("LOG", "USER :" + user->getCompleteName() + " (not enough parameters)");
 		return false;
 	}

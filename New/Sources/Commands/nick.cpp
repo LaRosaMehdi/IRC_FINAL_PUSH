@@ -42,17 +42,17 @@ bool	commandNickValid(std::string nick) {
 bool    commandNick(Server *server, User *user, std::vector<std::string> args) {
 	
 	if (args.size() != 2 && args[1].empty()) {
-		server->sendMessage("431", "Not nickname given", user);
+		user->sendMessage("431", "Not nickname given");
 		logs("LOG", "NICK :" + user->getCompleteName() + " (not enough parameters)");
 		return false;
 	}
 	else if (commandNickValid(args[1]) == false) {
-		server->sendMessage("432", "Erroneous nickname", user);
+		user->sendMessage("432", "Erroneous nickname");
 		logs("LOG", "NICK :" + user->getCompleteName() + " (erroneous nickname)");
 		return false;
 	}
 	else if (server->getUserByNickname(args[1]) != NULL) {
-		server->sendMessage("433", "Nickname is already in use", user);
+		user->sendMessage("433", "Nickname is already in use");
 		logs("LOG", "NICK :" + user->getCompleteName() + " (nickname already in use)");
 		return false;
 	}
