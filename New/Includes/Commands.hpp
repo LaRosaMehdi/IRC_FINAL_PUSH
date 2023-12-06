@@ -6,7 +6,7 @@
 /*   By: mla-rosa <mla-rosa@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 01:14:20 by mla-rosa          #+#    #+#             */
-/*   Updated: 2023/11/30 19:21:50 by mla-rosa         ###   ########.fr       */
+/*   Updated: 2023/12/05 15:52:11 by mla-rosa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,5 +25,6 @@ bool    commandNick(Server *server, User *user, std::vector<std::string> args);
 bool    commandUser(Server *server, User *user, std::vector<std::string> args);
 bool    commandJoin(Server *server, User *user, std::vector<std::string> args);
 bool    commandKick(Server *server, User *user, std::vector<std::string> args);
+bool    commandInvite(Server *server, User *user, std::vector<std::string> args);
 
 #endif

@@ -40,10 +40,16 @@ class Channel {
         User *getOperator() const;
         std::string	getUsersList(void);
         User* getUserByUsername(const std::string& username);
+        std::vector<User *> getInvitesList() const {
+            return _inviteList;
+        }
         // Setters
         void setName(const std::string& name);
         void setTopic(const std::string& topic);
         void setOperator(User* op);
+        void addUserToInviteList(User *user) {
+            _inviteList.push_back(user);
+        }
 
         // Is
         bool isOperator(User* user) const;
@@ -53,6 +59,7 @@ class Channel {
         std::string _topic;
         std::vector<User*> _users;
         std::vector<std::string> _messages;
+        std::vector<User *>	_inviteList;
         User *_operator;
 };
 

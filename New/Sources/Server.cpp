@@ -6,7 +6,7 @@
 /*   By: mla-rosa <mla-rosa@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 01:14:20 by mla-rosa          #+#    #+#             */
-/*   Updated: 2023/11/30 19:32:15 by mla-rosa         ###   ########.fr       */
+/*   Updated: 2023/12/06 13:37:48 by mla-rosa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,6 +270,10 @@ void Server::handleClientData(User *user) {
     }
     else if (commandArgs[0] == "KICK") {
         if (commandKick(this, user, commandArgs) == false)
+            return;
+    }
+    else if (commandArgs[0] == "INVITE") {
+        if (commandInvite(this, user, commandArgs) == false)
             return;
     }
     else if (commandArgs[0] == "PRIVMSG") {
