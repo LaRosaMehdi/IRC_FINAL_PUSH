@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mla-rosa <mla-rosa@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: dojannin <dojannin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 01:14:20 by mla-rosa          #+#    #+#             */
-/*   Updated: 2023/11/30 19:32:15 by mla-rosa         ###   ########.fr       */
+/*   Updated: 2023/12/06 16:59:21 by dojannin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,12 @@ void Server::init(void)
     if (listen(_socket, 10) == -1) {
         throw std::runtime_error(std::string(ERROR) + "[ERROR]:\t    " + RESET + "Listening failed\n");
     }
-    logs("LOG", "Starting server on 127.0.0.1:" + std::to_string(getPort()));
+    // char buffer[20];  // Assez grand pour stocker votre nombre entier
+
+    // // Utilisation de sprintf pour formater la chaîne
+    // sprintf(buffer, "%d", getPort());
+    // std::string key = buffer;
+    logs("LOG", "Starting server on 127.0.0.1:" + intToString(getPort()));
 }
 
 
@@ -88,7 +93,7 @@ void Server::run() {
             FD_SET((*it)->getSocket(), &readFds);
         }
 
-        int selectResult = select(_maxReadFds, &readFds, nullptr, nullptr, nullptr);
+        int selectResult = select(_maxReadFds, &readFds, NULL, NULL, NULL);
         if (selectResult == -1) {
             throw std::runtime_error(std::string(ERROR) + "[ERROR]:\t    " + RESET + "Select failed\n");
         }
@@ -121,6 +126,7 @@ void Server::handleClientConnection() {
     }
     User *user = new User(clientSocket, clientAddress);
     
+    std::cout << "test" << std::endl;
     std::pair<std::string, int> read = readFromClientSocket(user->getSocket());
     if (read.first == "" && read.second == -1) {
         handleClientDisconnection(user);
@@ -233,7 +239,7 @@ bool Server::connectClient(User *user) {
     User *tmp = getUserByCompleteName(user->getCompleteName());
     if (tmp != NULL)
         handleClientDisconnection(tmp);
-    logs("LOG", "New connection from " + std::string(inet_ntoa(user->getAddress().sin_addr)) + ":" + std::to_string(ntohs(user->getAddress().sin_port)));
+    logs("LOG", "New connection from " + std::string(inet_ntoa(user->getAddress().sin_addr)) + ":" + intToString(ntohs(user->getAddress().sin_port)));
     addUser(user);
     user->setConnected(true);
     // sendMessage("001", "Welcome to Internet Relay Network !", user);
@@ -272,6 +278,10 @@ void Server::handleClientData(User *user) {
         if (commandKick(this, user, commandArgs) == false)
             return;
     }
+   else if (commandArgs[0] == "INVITE") {
+        if (commandInvite(this, user, commandArgs) == false)
+            return;
+    }   
     else if (commandArgs[0] == "PRIVMSG") {
         std::string channelName = buffer.substr(9, buffer.find(' ', 9) - 9);
         std::string message = buffer.substr(buffer.find(' ', 9) + 1);
@@ -286,15 +296,24 @@ std::pair<std::string, int> Server::readFromClientSocket(int socket) {
     while (true) {
         char buffer[4096];
         ssize_t bytesRead = recv(socket, buffer, sizeof(buffer), 0);
+
         if (bytesRead <= 0) {
             return std::make_pair("", -1);
         }
+        
         if (bytesRead > 0) {
+
             buffer[bytesRead] = '\0';
+            std::cout << buffer << std::endl;
             std::vector<std::string> split = splitString(std::string(buffer), '\n');
+            std::cout << "true" << std::endl;
             for (int idx = 0; idx < (int)split.size(); idx++) {
                 logs("RECEIVED", trimString(split[idx]));
+                std::cout << "true" << std::endl;
+
             }
+            std::cout << "true" << std::endl;
+
             std::string read = std::string(buffer, bytesRead);
             return std::make_pair(read, bytesRead);
         }

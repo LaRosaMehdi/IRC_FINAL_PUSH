@@ -8,10 +8,10 @@ User::User(const int socket, const struct sockaddr_in& addr)
     : _fd(socket), _address(addr)
 {
 
-    setUsername("default" + std::to_string(defaultUserIndex));
-    setNickname("default" + std::to_string(defaultUserIndex));
-    setRealname("default" + std::to_string(defaultUserIndex));
-    setHostname("default" + std::to_string(defaultUserIndex));
+    setUsername("default" + intToString(defaultUserIndex));
+    setNickname("default" + intToString(defaultUserIndex));
+    setRealname("default" + intToString(defaultUserIndex));
+    setHostname("default" + intToString(defaultUserIndex));
     setAccepted(false);
     setConnected(false);
     defaultUserIndex += 1;

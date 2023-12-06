@@ -17,7 +17,10 @@
 #include <vector>
 #include <algorithm>
 #include <string>
-#include "User.hpp"
+#include "./User.hpp"
+#include "./Server.hpp"
+
+class User; 
 
 class Channel {
     public:

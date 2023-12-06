@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mla-rosa <mla-rosa@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: dojannin <dojannin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 01:14:20 by mla-rosa          #+#    #+#             */
-/*   Updated: 2023/11/30 19:28:19 by mla-rosa         ###   ########.fr       */
+/*   Updated: 2023/12/06 15:18:54 by dojannin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 
 #include <vector>
 #include <iostream>
-#include <chrono>
-#include <thread>
+// #include <chrono>
+// #include <thread>
 #include <cstring>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -27,13 +27,15 @@
 #include <sys/ioctl.h>
 #include <map>  // Added for std::map
 #include <utility>
-
+#include <cstdio>
 #include "./User.hpp"
 #include "./utils.hpp"
 #include "./Channel.hpp"  // Added for Channel class
 #include "./Commands.hpp"
 
-extern int defaultUserIndex;
+// extern int defaultUserIndex;
+
+class Channel;
 
 class Server
 {

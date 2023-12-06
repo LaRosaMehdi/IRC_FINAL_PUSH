@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic -g3
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic -g3#<-fsanitize=address
 SRC_DIR = ./Sources
 EXECUTABLE = ircserv
 

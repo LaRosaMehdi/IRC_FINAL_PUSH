@@ -65,7 +65,7 @@ std::vector<std::string> splitCommandUser(const std::string& input) {
 
     while (std::getline(iss, token, ' ')) {
         if (token.empty()) continue;
-        if (token.front() == ':') {
+        if (!token.empty() && token[0] == ':') {
             // Combining tokens starting from ':' until the end
             std::string combinedToken = token.substr(1);
             while (std::getline(iss, token, ' ')) {
@@ -90,27 +90,45 @@ void        logs(std::string type, std::string message) {
         std::cout << LOG << "[LOG]:\t        " << RESET << message << std::endl;
 }
 
-std::string trimString(const std::string& str) {
-    std::string result;
-    bool spaceFound = false;
-    bool nonWhitespaceFound = false;
+// std::string trimString(const std::string& str) {
+//     std::string result;
+//     bool spaceFound = false;
+//     bool nonWhitespaceFound = false;
 
-    for (size_t i = 0; i < str.size(); ++i) {
-        char c = str[i];
-        if ((std::isspace(c))) {
-            if (!spaceFound && nonWhitespaceFound) {
-                result += ' ';
-                spaceFound = true;
-            }
-        } else {
-            result += c;
-            spaceFound = false;
-            nonWhitespaceFound = true;
-        }
+//     for (size_t i = 0; i < str.size(); ++i) {
+//         char c = str[i];
+//         if ((std::isspace(c))) {
+//             if (!spaceFound && nonWhitespaceFound) {
+//                 result += ' ';
+//                 spaceFound = true;
+//             }
+//         } else {
+//             result += c;
+//             spaceFound = false;
+//             nonWhitespaceFound = true;
+//         }
+//     }
+//     if (!result.empty() && result[result.length() - 1] == ' ') {
+//         result = trimString(result);
+//     }
+//     return result;
+// }
+
+std::string trimString(const std::string& input) {
+    size_t start = input.find_first_not_of(" \n\t\v\f\r");
+    size_t end = input.find_last_not_of(" \n\t\v\f\r");
+    if (start == std::string::npos || end == std::string::npos) {
+        return "";  // Empty or whitespace-only string
     }
-    if (!result.empty() && result.back() == ' ') {
-        result.pop_back();
-    }
-    return result;
+    return input.substr(start, end - start + 1);
 }
 
+std::string intToString(int value) {
+    char buffer[20]; // Assurez-vous que la taille du tampon est suffisamment grande
+
+    // Utilisation de sprintf pour formater la chaîne
+    sprintf(buffer, "%d", value);
+
+    // Conversion du tampon en std::string
+    return std::string(buffer);
+}

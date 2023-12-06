@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mla-rosa <mla-rosa@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: dojannin <dojannin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 01:14:20 by mla-rosa          #+#    #+#             */
-/*   Updated: 2023/11/30 19:23:28 by mla-rosa         ###   ########.fr       */
+/*   Updated: 2023/12/06 14:21:05 by dojannin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "./../Includes/utils.hpp"
 
 int main(int ac, char **av) {
-    Server* server = nullptr;
+    Server* server = NULL;
     if (ac != 3) {
         logs("ERROR", "Usage ./test <username> <nickname>");
         return EXIT_FAILURE;
