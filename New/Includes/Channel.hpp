@@ -17,10 +17,9 @@
 #include <vector>
 #include <algorithm>
 #include <string>
-#include "./User.hpp"
-#include "./Server.hpp"
+#include "User.hpp"
 
-class User; 
+class User;
 
 class Channel {
     public:
@@ -30,6 +29,7 @@ class Channel {
         // User management
         bool    removeUser(User* user);
         void    joinUser(User* user);
+        void    joinOperator(User* user);
         
         // Message management
         void sendBroadcastMessage(const std::string& message, User* sender);
@@ -40,13 +40,17 @@ class Channel {
         std::string getName() const;
         std::vector<User *> getUsers() const;
         std::string getTopic() const;
-        User *getOperator() const;
+        User *getFirstOperator() const;
+        std::vector<User *> getOperator() const;
         std::string	getUsersList(void);
         User* getUserByUsername(const std::string& username);
+        User* getOperatorByUsername(const std::string& username);
         // Setters
         void setName(const std::string& name);
         void setTopic(const std::string& topic);
         void setOperator(User* op);
+        void clearTopic(void);
+
 
         // Is
         bool isOperator(User* user) const;
@@ -56,7 +60,7 @@ class Channel {
         std::string _topic;
         std::vector<User*> _users;
         std::vector<std::string> _messages;
-        User *_operator;
+        std::vector<User*> _operator;
 };
 
 #endif /* !CHANNELS_HPP */

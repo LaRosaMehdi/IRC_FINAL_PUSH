@@ -6,7 +6,7 @@
 /*   By: dojannin <dojannin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 01:14:20 by mla-rosa          #+#    #+#             */
-/*   Updated: 2023/12/06 16:59:21 by dojannin         ###   ########.fr       */
+/*   Updated: 2023/12/12 14:41:15 by dojannin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,6 @@ void Server::handleClientConnection() {
     }
     User *user = new User(clientSocket, clientAddress);
     
-    std::cout << "test" << std::endl;
     std::pair<std::string, int> read = readFromClientSocket(user->getSocket());
     if (read.first == "" && read.second == -1) {
         handleClientDisconnection(user);
@@ -278,15 +277,25 @@ void Server::handleClientData(User *user) {
         if (commandKick(this, user, commandArgs) == false)
             return;
     }
-   else if (commandArgs[0] == "INVITE") {
+    else if (commandArgs[0] == "INVITE") {
         if (commandInvite(this, user, commandArgs) == false)
             return;
-    }   
+    }
+    else if (commandArgs[0] == "TOPIC") {
+        if (commandTopic(this, user, commandArgs) == false)
+            return;
+        std::cout << "commandArgs[2].substr(1) = " << commandArgs[2].substr(1) << std::endl;
+        std::cout << "Fin commande Topic: Channel.Topic = " << this->getChannelByName(commandArgs[1].substr(1))->getName() << std::endl;
+    }
+    else if (commandArgs[0] == "MODE"){
+        std::cout << "Enter in MODED ZONE" << std::endl;
+    }
     else if (commandArgs[0] == "PRIVMSG") {
         std::string channelName = buffer.substr(9, buffer.find(' ', 9) - 9);
         std::string message = buffer.substr(buffer.find(' ', 9) + 1);
         sendPrivateMessage(user, channelName, message);
     }
+    std::cout << "fin handle data" << std::endl;
     return;
 }
 
@@ -306,13 +315,13 @@ std::pair<std::string, int> Server::readFromClientSocket(int socket) {
             buffer[bytesRead] = '\0';
             std::cout << buffer << std::endl;
             std::vector<std::string> split = splitString(std::string(buffer), '\n');
-            std::cout << "true" << std::endl;
+            // std::cout << "true" << std::endl;
             for (int idx = 0; idx < (int)split.size(); idx++) {
                 logs("RECEIVED", trimString(split[idx]));
-                std::cout << "true" << std::endl;
+                // std::cout << "true" << std::endl;
 
             }
-            std::cout << "true" << std::endl;
+            // std::cout << "true" << std::endl;
 
             std::string read = std::string(buffer, bytesRead);
             return std::make_pair(read, bytesRead);
@@ -422,7 +431,12 @@ User *Server::getUserByCompleteName(const std::string& completeName) {
 Channel *Server::createChannel(const std::string& channelName, User* user) {
     Channel *channel = new Channel(channelName, user);
     std::cout << "Channel name create: " << channel->getName() << std::endl;
+    std::cout << "Channel operator is: " << channel->getFirstOperator()->getUsername() << std::endl;
+    channel->joinOperator(user);
+   
     _channels.push_back(channel);
+   
+    std::cout << "_channels = " << _channels.front()->getFirstOperator()->getUsername() << std::endl;
     return channel;
 }
 
@@ -462,11 +476,12 @@ void Server::sendPrivateMessage(User* sender, const std::string& channelName, co
     Channel* channel = getChannelByName(channelName);
     if (channel) {
         for (int i = 0; i < (int)channel->getUsers().size(); i++) {
-            std::cout << "SENDING MESSAGE TO " << channel->getUsers()[i]->getNickname()  << "FROM " << sender->getNickname() << std::endl;
+            std::cout << "SENDING MESSAGE TO " << channel->getUsers()[i]->getNickname()  << " FROM " << sender->getNickname() << std::endl;
             std::string msg = ":" + sender->getNickname() + " PRIVMSG #" + channelName + " " + message + "\r\n";
             std::cout << "Message: " << msg << std::endl;
             if (channel->getUsers()[i]->getCompleteName() != sender->getCompleteName())
                 send(channel->getUsers()[i]->getSocket(), msg.c_str(), msg.size(), 0);
+            std::cout << "fin send message" << std::endl;
         }
     }
     else {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   join.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mla-rosa <mla-rosa@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: dojannin <dojannin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/21 14:19:39 by dojannin          #+#    #+#             */
-/*   Updated: 2023/11/30 19:23:01 by mla-rosa         ###   ########.fr       */
+/*   Updated: 2023/12/11 16:49:56 by dojannin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,15 @@ bool commandJoin(Server* server, User* user, std::vector<std::string> args) {
         channel->joinUser(user);
     } else {
         channel = server->createChannel(args[1].substr(1), user);
+        std::cout << channel->getFirstOperator()->getUsername() << std::endl;
         if (channel == NULL) {
             user->sendMessage("400", "Failed to create channel " + args[1].substr(1));
             logs("LOG", "JOIN :" + user->getCompleteName() + " (failed to create channel " + args[1].substr(1) + ")");
             return false;
         }
         channel->joinUser(user);
+        channel->joinOperator(user);
+        // server.
     } 
     if (channel->getTopic() == "") {
         channel->sendChannelMessage("332", "No topic is set", user);

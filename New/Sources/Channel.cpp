@@ -2,8 +2,10 @@
 
 // Constructor / Destructor
 
-Channel::Channel(const std::string& name, User *op) : _name(name), _operator(op) {
+Channel::Channel(const std::string& name, User *op) : _name(name){
     setTopic("");
+    setOperator(op);
+    _users.push_back(op);
 }
 
 Channel::~Channel() {}
@@ -24,6 +26,12 @@ void    Channel::joinUser(User* user)
 {
     _users.push_back(user);
     sendBroadcastMessage(":" + user->getCompleteName() + " JOIN #" + getName() + "\r\n", user);
+}
+
+void    Channel::joinOperator(User* user)
+{
+    _operator.push_back(user);
+    // sendBroadcastMessage(":" + user->getCompleteName() + " JOIN #" + getName() + "\r\n", user);
 }
 
 // Message management
@@ -66,7 +74,9 @@ std::vector<User *> Channel::getUsers() const { return _users; }
 
 std::string Channel::getTopic() const { return _topic; }
 
-User *Channel::getOperator() const { return _operator; }
+User    *Channel::getFirstOperator() const {return *_operator.begin() ;}
+
+std::vector<User *>Channel::getOperator() const { return _operator; }
 
 std::string Channel::getUsersList() { 
     std::string usersList;
@@ -80,6 +90,15 @@ std::string Channel::getUsersList() {
     return usersList;
 }
 
+User* Channel::getOperatorByUsername(const std::string& username) {
+    for (int i = 0; i < (int)getOperator().size(); i++) {
+        if (getOperator()[i]->getUsername() == username) 
+            return getOperator()[i];         
+    }
+    return NULL;
+}
+
+
 User* Channel::getUserByUsername(const std::string& username) {
     for (int i = 0; i < (int)getUsers().size(); i++) {
         if (getUsers()[i]->getUsername() == username) 
@@ -89,13 +108,26 @@ User* Channel::getUserByUsername(const std::string& username) {
 }
 
 // Setters
-
+void		Channel::clearTopic(void) { _topic.clear();}
 void Channel::setName(const std::string &name) { _name = name; }
 
 void Channel::setTopic(const std::string &topic) { _topic = topic; }
 
-void Channel::setOperator(User *op) { _operator = op; }
+void Channel::setOperator(User *op) { _operator.push_back(op); }
 
 // Is
 
-bool Channel::isOperator(User *user) const { return user == _operator; }
+bool Channel::isOperator(User *user) const { 
+    // std::cout << "wsssh mgl"<< std::endl;
+    // std::cout << getFirstOperator()->getUsername() << std::endl;
+    if (!_operator.empty()) {
+        std::vector<User*>::const_iterator it = _operator.begin();
+    // La boucle commence ici sans besoin de vérifier à nouveau si le vecteur est vide
+        for (; it != _operator.end(); it++){
+            if (user == *it)
+                return true;
+            }
+    }
+    std::cout << "finish function" << std::endl;
+    return false;
+}

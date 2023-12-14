@@ -10,10 +10,11 @@ bool    commandInvite(Server *server, User *user, std::vector<std::string> args)
 		user->sendMessage("461", "Not enough parameters");
 		return false;
 	}
-
 	std::string channelName = args[2].substr(1);
 	std::string userName = args[1];
 	Channel* channel = server->getChannelByName(channelName);
+std::cout<< "commandInvite" << std::endl;
+		std::cout << std::endl;
 
 	if (channel == NULL)
 	{
@@ -29,16 +30,25 @@ bool    commandInvite(Server *server, User *user, std::vector<std::string> args)
 	else
 	{	
 		std::vector<User*> users = channel->getUsers();
-		std::string message = ":" + user->getCompleteName() + " INVITE #" + targetUser->getNickname() + " " + channel->getName() + "\r\n";
-		send(targetUser->getSocket(), message.c_str(), message.size(), 0);
-		for (int i = 0; i < (int)users.size() + 1; i++)
-		{
-			if (users[i] != targetUser)
+		std::cout << "Ceci EST le test" << std::endl;
+		// std::cout << channel->getOperatorByUsername(user->getUsername())->getUsername() << std::endl;
+		if (user == channel->getOperatorByUsername(user->getUsername())){
+			std::string message = ":" + user->getCompleteName() + " INVITE #" + targetUser->getNickname() + " " + channel->getName() + "\r\n";
+			send(targetUser->getSocket(), message.c_str(), message.size(), 0);
+			for (int i = 0; i < (int)users.size(); i++)
 			{
+				if (users[i] != targetUser)
+				{
+				}
 			}
+			logs(LOG, message);
+			}
+		else 
+		{
+			user->sendMessage("482", "-!- Irssi: You're not channel operator");
+			return false;
 		}
-		logs(LOG, message);
-		channel->addUserToInviteList(targetUser);
+		// channel->addUserToInviteList(targetUser);
 		
 		//for (int i = 0; i < (int)channel->getInvitesList().size(); i++)
 		//{

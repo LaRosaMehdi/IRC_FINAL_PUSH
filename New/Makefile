@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic -g3#<-fsanitize=address
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic -g3 -fsanitize=address
 SRC_DIR = ./Sources
 EXECUTABLE = ircserv
 
@@ -13,7 +13,10 @@ SRCS = \
     $(SRC_DIR)/Commands/nick.cpp \
     $(SRC_DIR)/Commands/user.cpp \
     $(SRC_DIR)/Commands/join.cpp \
-    $(SRC_DIR)/Commands/kick.cpp 
+    $(SRC_DIR)/Commands/kick.cpp \
+    $(SRC_DIR)/Commands/invite.cpp \
+    $(SRC_DIR)/Commands/topic.cpp 
+
 
 OBJS = $(SRCS:.cpp=.o)
 

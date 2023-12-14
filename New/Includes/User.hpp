@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   User.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mla-rosa <mla-rosa@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: dojannin <dojannin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 01:14:20 by mla-rosa          #+#    #+#             */
-/*   Updated: 2023/11/30 19:28:28 by mla-rosa         ###   ########.fr       */
+/*   Updated: 2023/12/10 17:35:33 by dojannin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ class User {
         bool                _checkuser;
 
     public:
-
+        
         User(const int socket, const struct sockaddr_in& addr);
         User(const std::string& username, const std::string& nickname, int sock, const struct sockaddr_in& addr);
         User(const std::string& username, const std::string& nickname, int sock, const struct sockaddr_in& addr, bool accepted, bool connected);
