@@ -45,15 +45,32 @@ class Channel {
         std::string	getUsersList(void);
         User* getUserByUsername(const std::string& username);
         User* getOperatorByUsername(const std::string& username);
+        bool  getInviteBool(void) const;
         // Setters
         void setName(const std::string& name);
         void setTopic(const std::string& topic);
+        void setPassword(const std::string &pass);
         void setOperator(User* op);
         void clearTopic(void);
+        void giveTakeOperator(User* user, bool );
 
 
         // Is
         bool isOperator(User* user) const;
+        //Mode
+        void setInviteOnly(bool );
+        void setTopicRestriction(bool pass);
+        void setChannelPass(std::string);
+        void removeChannelPass(void);
+        bool isInvitedByOperator(User *invited);
+        bool addInvited(User *ope, User *invit);
+        bool getTopicRestriction(void);
+        bool getPasswordRestriction(void);
+        std::string getPassword(void);
+
+
+
+
         
     private:
         std::string _name;
@@ -61,6 +78,11 @@ class Channel {
         std::vector<User*> _users;
         std::vector<std::string> _messages;
         std::vector<User*> _operator;
+        std::vector<User*> _invited;
+        bool               _inviteOnly;
+        bool               _topicRestriction;
+        bool               _keyRestriction;
+        std::string        _password;
 };
 
 #endif /* !CHANNELS_HPP */

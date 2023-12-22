@@ -2,7 +2,7 @@
 
 // Constructor / Destructor
 
-Channel::Channel(const std::string& name, User *op) : _name(name){
+Channel::Channel(const std::string& name, User *op) : _name(name), _inviteOnly(false), _topicRestriction(false), _keyRestriction(false), _password(""){
     setTopic("");
     setOperator(op);
     _users.push_back(op);
@@ -107,9 +107,13 @@ User* Channel::getUserByUsername(const std::string& username) {
     return NULL;
 }
 
+
+
 // Setters
 void		Channel::clearTopic(void) { _topic.clear();}
 void Channel::setName(const std::string &name) { _name = name; }
+
+void Channel::setPassword(const std::string &pass) { _password = pass; }
 
 void Channel::setTopic(const std::string &topic) { _topic = topic; }
 
@@ -118,16 +122,89 @@ void Channel::setOperator(User *op) { _operator.push_back(op); }
 // Is
 
 bool Channel::isOperator(User *user) const { 
-    // std::cout << "wsssh mgl"<< std::endl;
-    // std::cout << getFirstOperator()->getUsername() << std::endl;
     if (!_operator.empty()) {
         std::vector<User*>::const_iterator it = _operator.begin();
-    // La boucle commence ici sans besoin de vérifier à nouveau si le vecteur est vide
         for (; it != _operator.end(); it++){
             if (user == *it)
                 return true;
             }
     }
-    std::cout << "finish function" << std::endl;
     return false;
+}
+
+
+//Mode 
+
+bool Channel::getInviteBool() const { return _inviteOnly; }
+
+void    Channel::setChannelPass(std::string pass){ std::cout << pass << std::endl;
+    std::cout << "oue " << std::endl;
+    _password = pass.substr(0, pass.size());
+    std::cout << "_password: " << _password << std::endl;
+    _keyRestriction = true;
+}
+
+void    Channel::removeChannelPass(void){
+    _password = "";
+    _keyRestriction = false;
+}
+
+std::string    Channel::getPassword(void){ return  _password; }
+
+bool    Channel::getPasswordRestriction(void){ return  _keyRestriction; }
+
+bool    Channel::getTopicRestriction(void){ return  _topicRestriction; }
+
+
+void    Channel::setTopicRestriction(bool pass){ std::cout << pass << std::endl;
+    _topicRestriction = pass; }
+
+void    Channel::setInviteOnly(bool invit){ std::cout << invit << std::endl;
+    _inviteOnly = invit; }
+
+bool    Channel::isInvitedByOperator(User *invit){
+    if (!_invited.empty()) {
+        std::vector<User*>::const_iterator it = _invited.begin();
+        for (; it != _operator.end(); it++){
+            if (invit == *it)
+                return true;
+            }
+    }
+    return false;
+}
+
+bool    Channel::addInvited(User *ope, User *invit){
+    if (ope && invit){
+        _invited.push_back(invit);
+        return true;
+    }
+    return false;
+}
+
+void    Channel::giveTakeOperator(User* user, bool bol){
+    if (bol == true){
+        if (getOperatorByUsername(user->getUsername())){
+            std::cout << "Error: UserTarget is already an operator!" << std::endl;
+        }
+        else if (!getOperatorByUsername(user->getUsername())){
+            setOperator(user);
+            std::cout << user->getUsername() << "became a new operator of " << getName() << std::endl;
+        }
+    }
+    else if (bol == false){
+        if (!getOperatorByUsername(user->getUsername())){
+            std::cout << "Error: UserTarget is not an operator!" << std::endl;
+        }
+        else{
+            std::vector<User *>::iterator it = std::find(getOperator().begin(), getOperator().end(), user);
+            if (it != getOperator().end()) {
+                getOperator().erase(it);
+                std::cout << user->getUsername() << "lose operator right." << std::endl;
+                for (std::vector<User *>::iterator iter = getOperator().begin(); iter != getOperator().end(); ++iter) {
+                    std::cout << *iter << " ";
+                }
+                std::cout << std::endl;
+            }
+        }
+    }
 }

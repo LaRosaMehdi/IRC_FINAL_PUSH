@@ -33,8 +33,11 @@ std::cout<< "commandInvite" << std::endl;
 		std::cout << "Ceci EST le test" << std::endl;
 		// std::cout << channel->getOperatorByUsername(user->getUsername())->getUsername() << std::endl;
 		if (user == channel->getOperatorByUsername(user->getUsername())){
-			std::string message = ":" + user->getCompleteName() + " INVITE #" + targetUser->getNickname() + " " + channel->getName() + "\r\n";
+    // :inviterNick!inviterUser@inviter.host.com 341 yourNick #channel
+
+			std::string message = ":" + user->getCompleteName() + " 341 " + targetUser->getNickname() + " #" + channel->getName() + "\r\n";
 			send(targetUser->getSocket(), message.c_str(), message.size(), 0);
+			channel->addInvited(user, targetUser);
 			for (int i = 0; i < (int)users.size(); i++)
 			{
 				if (users[i] != targetUser)

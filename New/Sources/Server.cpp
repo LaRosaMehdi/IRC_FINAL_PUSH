@@ -6,7 +6,7 @@
 /*   By: dojannin <dojannin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 01:14:20 by mla-rosa          #+#    #+#             */
-/*   Updated: 2023/12/12 14:41:15 by dojannin         ###   ########.fr       */
+/*   Updated: 2023/12/20 16:10:54 by dojannin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -288,9 +288,11 @@ void Server::handleClientData(User *user) {
         std::cout << "Fin commande Topic: Channel.Topic = " << this->getChannelByName(commandArgs[1].substr(1))->getName() << std::endl;
     }
     else if (commandArgs[0] == "MODE"){
-        std::cout << "Enter in MODED ZONE" << std::endl;
+        if (commandMode(this, user, commandArgs) == false)
+            return;
     }
     else if (commandArgs[0] == "PRIVMSG") {
+        
         std::string channelName = buffer.substr(9, buffer.find(' ', 9) - 9);
         std::string message = buffer.substr(buffer.find(' ', 9) + 1);
         sendPrivateMessage(user, channelName, message);

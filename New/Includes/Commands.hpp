@@ -6,7 +6,7 @@
 /*   By: dojannin <dojannin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 01:14:20 by mla-rosa          #+#    #+#             */
-/*   Updated: 2023/12/11 19:09:52 by dojannin         ###   ########.fr       */
+/*   Updated: 2023/12/19 16:03:45 by dojannin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,5 +27,7 @@ bool    commandJoin(Server *server, User *user, std::vector<std::string> args);
 bool    commandKick(Server *server, User *user, std::vector<std::string> args);
 bool    commandInvite(Server *server, User *user, std::vector<std::string> args);
 bool    commandTopic(Server *server, User *user, std::vector<std::string> args);
+bool    commandMode(Server *server, User *user, std::vector<std::string> args);
+
 
 #endif

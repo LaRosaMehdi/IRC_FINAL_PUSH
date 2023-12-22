@@ -27,6 +27,11 @@ bool commandKick(Server* server, User* user, std::vector<std::string> args)
         user->sendMessage("441", "They aren't on that channel");
         return false;
     }
+    if (channel->getOperatorByUsername(user->getUsername()) == false)
+    {
+        user->sendMessage("482", "You're not channel operator");
+        return false;
+    }
     if (channel->removeUser(targetUser) == false)
     {
         logs(ERROR, "Error removing user from channel");

@@ -15,7 +15,9 @@ SRCS = \
     $(SRC_DIR)/Commands/join.cpp \
     $(SRC_DIR)/Commands/kick.cpp \
     $(SRC_DIR)/Commands/invite.cpp \
-    $(SRC_DIR)/Commands/topic.cpp 
+    $(SRC_DIR)/Commands/topic.cpp \
+    $(SRC_DIR)/Commands/mode.cpp 
+
 
 
 OBJS = $(SRCS:.cpp=.o)

@@ -6,11 +6,16 @@
 /*   By: dojannin <dojannin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/21 14:19:39 by dojannin          #+#    #+#             */
-/*   Updated: 2023/12/11 16:49:56 by dojannin         ###   ########.fr       */
+/*   Updated: 2023/12/21 18:15:37 by dojannin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./../../Includes/Server.hpp"
+
+/*
+    :server.example.com 473 yourNick #channel :Cannot join channel (+i)
+    :inviterNick!inviterUser@inviter.host.com 341 yourNick #channel
+*/
 
 bool commandJoin(Server* server, User* user, std::vector<std::string> args) {
     Channel* channel = NULL;
@@ -27,8 +32,38 @@ bool commandJoin(Server* server, User* user, std::vector<std::string> args) {
 
     channel = server->getChannelByName(args[1].substr(1));
     if (channel != NULL) {
-        channel->joinUser(user);
-    } else {
+        if (channel->getInviteBool() == true){ 
+            std::cout << "tu reeeentres" << std::endl;
+            if (!channel->isInvitedByOperator(user)){
+                user->sendMessage("473", "-!- Irssi: Cannot join channel");
+                logs("LOG", "JOIN :" + user->getCompleteName() + " (cannot join channel " + args[1].substr(1) + ")");
+                return false;
+            }
+        }
+        else if (channel->getPasswordRestriction() == true){
+            if (args.size() == 3){
+                if (args[2] == channel->getPassword()){
+                    channel->joinUser(user);   
+                }
+                else{
+                    user->sendMessage("475", "-!- Irssi: Cannot join channel (+k)");
+                    logs("LOG", "JOIN :" + user->getCompleteName() + " (cannot join channel " + args[1].substr(1) + ")");
+                    return false;
+                }
+            }
+            else{
+                // :serveur-irc 475 votre-pseudo #nom-du-canal :Cannot join channel (+k)
+                user->sendMessage("475", "-!- Irssi: Cannot join channel (+k)");
+                logs("LOG", "JOIN :" + user->getCompleteName() + " (cannot join channel " + args[1].substr(1) + ")");
+                return false;
+            }
+        }
+        else
+            channel->joinUser(user);
+    } 
+    else 
+    {
+        std::cout << "weeeee" << std::endl;
         channel = server->createChannel(args[1].substr(1), user);
         std::cout << channel->getFirstOperator()->getUsername() << std::endl;
         if (channel == NULL) {
@@ -36,10 +71,20 @@ bool commandJoin(Server* server, User* user, std::vector<std::string> args) {
             logs("LOG", "JOIN :" + user->getCompleteName() + " (failed to create channel " + args[1].substr(1) + ")");
             return false;
         }
+        if (channel->getInviteBool() == true){ 
+            std::cout << "tu reeeentres" << std::endl;
+            if (!channel->isInvitedByOperator(user)){
+                user->sendMessage("473", "-!- Irssi: Cannot join channel");
+                logs("LOG", "JOIN :" + user->getCompleteName() + " (failed to create channel " + args[1].substr(1) + ")");
+                return false;
+            }
+        }
+        std::cout << "meme pas et cest pour ca" << std::endl;
         channel->joinUser(user);
         channel->joinOperator(user);
         // server.
     } 
+    std::cout << "je sais je sais " << std::endl;
     if (channel->getTopic() == "") {
         channel->sendChannelMessage("332", "No topic is set", user);
         logs("LOG", "JOIN :" + user->getCompleteName() + " (no topic is set)");

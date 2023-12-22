@@ -6,7 +6,7 @@
 /*   By: dojannin <dojannin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/07 22:45:17 by dojannin          #+#    #+#             */
-/*   Updated: 2023/12/12 17:32:53 by dojannin         ###   ########.fr       */
+/*   Updated: 2023/12/21 16:55:26 by dojannin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,6 @@ bool	commandTopic(Server *serv, User *user, std::vector<std::string> arg) {
             std::cout << rpl;
 			send(user->getSocket(), rpl.c_str(), rpl.size(), 0); 
 			serv->sendPrivateMessage(user, chan->getName(), rpl);
-
 		}
 		// std::cout << chan->getName() << std::endl;
         // std::cout << "See it" << std::endl;
@@ -76,7 +75,7 @@ bool	commandTopic(Server *serv, User *user, std::vector<std::string> arg) {
 		// std::cout << "try = " << serv->getChannelByName(chan->getName()) << std::endl;
 		// std::cout << "chan = " << chan->getFirstOperator()->getUsername() << std::endl;
 		if (chan){
-			if (chan->isOperator(user)) {
+			if (chan->isOperator(user) || !chan->getTopicRestriction()) {
             std::cout << "check" << std::endl;
 			/* 
 			! the user must be a superUser to set the topic.
